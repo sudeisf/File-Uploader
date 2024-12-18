@@ -1,8 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
@@ -33,7 +29,7 @@ model Folder {
   userId     String   @db.ObjectId
   user      User     @relation(fields: [userId], references: [id])
   files     File[]
-  Shares Share[]
+  Shares Share[]    @relation("FolderShares")
 }
 
 model File {
@@ -49,6 +45,6 @@ model File {
 model Share {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   folderId   String   @db.ObjectId
-  folder    Folder   @relation(fields: [folderId], references: [id])
+  folder    Folder   @relation(fields: [folderId], references: [id], name: "FolderShares")
   expiresAt DateTime
 }
