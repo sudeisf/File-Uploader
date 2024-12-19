@@ -1,22 +1,22 @@
-const bctypt  = require('bcrypt');  
+const bcrypt  = require('bcrypt');  
 const path  = require('path')
 const fs  = require('fs');
 const jwt  = require('jsonwebtoken');
 
 
-const pathToPrivateKey = path.join(__dirname,'utils','private.pem');
+const pathToPrivateKey = path.join(__dirname, 'private.pem');
 const privateKey = fs.readFileSync(pathToPrivateKey, 'utf8');
 
 
 
-const generatePassword  = async (password) => {
-    const salt = await bctypt.genSalt(10);
-    const hash = await bctypt.hash(password, salt);
+async function generatePassword  (password) {
+    const salt = await  bcrypt.genSalt(10);
+    const hash = await  bcrypt.hash(password, salt);
     return hash;
 }
 
 const comparePassword  = async (password, hash) => {
-    return await bctypt.compare(password, hash);    
+    return await    bcrypt.compare(password, hash);    
 }
 
 
@@ -40,7 +40,7 @@ const issueToken  = (user) => {
 }
 
 
-module.eports = {
+module.exports = {
     generatePassword,
     comparePassword,
     issueToken

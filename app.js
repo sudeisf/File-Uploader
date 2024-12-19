@@ -5,6 +5,7 @@ const passport = require('passport');
 const { PrismaClient } = require('@prisma/client');
 const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const path = require('path');
+const authRoute = require('./routes/auth');
 
 const prisma = new PrismaClient(); // Initialize Prisma client
 
@@ -27,6 +28,10 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(express.json());
+app.use('/auth', authRoute);
+
+
 
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
