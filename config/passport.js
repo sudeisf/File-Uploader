@@ -5,9 +5,6 @@ const { PrismaClient }  = require('@prisma/client');
 const prismaClient  = new PrismaClient();
 
 
-
-
-
 const options = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: process.env.JWT_SECRET
@@ -15,7 +12,7 @@ const options = {
 
 passport.use(new Stratagy(options,async (payload, done, done) => {
     try{
-        const user  = await prisma.user.findUnique({
+        const user  = await prismaClient.user.findUnique({
             where: {id: payload.sub}
         });
         if(!user){ 
