@@ -6,6 +6,7 @@ const { PrismaClient } = require('@prisma/client');
 const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const path = require('path');
 const authRoute = require('./routes/auth');
+const cors = require('cors');
 
 const prisma = new PrismaClient(); // Initialize Prisma client
 
@@ -25,6 +26,14 @@ app.use(
     }),
   })
 );
+
+
+app.use(cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
+}))
 
 app.use(passport.initialize());
 app.use(passport.session());

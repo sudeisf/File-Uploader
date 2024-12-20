@@ -2,11 +2,6 @@ const {PrismaClient} = require('@prisma/client')
 const prisma = new PrismaClient();
 const uitls = require('../utils/utils')
 
-
-
-
-
-
 const loginController = async (req, res) => {
 
     try{
