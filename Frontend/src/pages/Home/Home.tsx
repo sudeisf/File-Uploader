@@ -17,6 +17,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import uploadIcon from "@/assets/icons/upload.svg";
 import { useState } from "react";
 import jpeg from "@/assets/icons/jpg-svgrepo-com.svg";
+import remove from "@/assets/icons/remove.svg";
+import { Button } from "@/components/ui/button";
 
 
 const fileLimit = 2 * 1024 * 1024; // MB
@@ -103,29 +105,52 @@ const Home = () => {
        </Form>
 
           <div  className='flex flex-col items-start min-w-sm max-w-2xl mx-auto ' >
-              <h1 className="px-4 py-2 text-xl font-bold mt-4  w-full text-start">Progress</h1>
+              <h1 className=" py-2 text-xl font-normal mt-4  w-full text-start drop-shadow-sm">Progress</h1>
                 {
                     file && (
-                        <div className="flex flex-col items-start w-full ">
-                            <div className="text-md flex space-x-4 p-4 items-start border-[1px] mt-4 rounded-lg w-full text-start">
-                              <div className="my-auto">
-                                <img src={jpeg} alt="type-image" className="w-10"/>
-                              </div>
-                                    <div className="flex flex-col  space-y-1">
-                                        <h1 className="text-sm font-semibold p-0"> {file.name}</h1>
-                                        <div className="flex items-center max-w-md space-x-4">
-                                            <p className="text-sm font-normal uppercase">{file.type.split('/')[1]}</p>
-                                            <p className="text-md font-normal"> {(file.size / 1024).toFixed(2)} KB</p>
-                                        </div>
+                        <div className="flex flex-col items-start w-full">
+                        <div className="flex justify-between items-center border-[1px] mt-4 rounded-lg w-full group">
+                            <div className="text-md flex space-x-4 p-4 items-start text-start">
+                                <div className="my-auto">
+                                    <img src={jpeg} alt="type-image" className="w-10" />
+                                </div>
+                    
+                                <div className="flex flex-col space-y-1">
+                                    <h1 className="text-sm font-semibold p-0">{file.name}</h1>
+                                    <div className="flex items-center max-w-md space-x-4">
+                                        <p className="text-sm font-normal uppercase">{file.type.split('/')[1]}</p>
+                                        <p className="text-md font-normal">{(file.size / 1024).toFixed(2)} KB</p>
+                                    </div>
                                 </div>
                             </div>
-                            
-                        </div>      
+                            <div
+                                onClick={() => setFile(null)}
+                                className=" items-center hidden group-hover:flex p-3 mr-4 cursor-pointer transition duration-200 ease-in-out border-2   rounded-[50%]  hover:text-white"
+                            >
+                                <img
+                                    src={remove}
+                                    alt=""
+                                    className="w-3 transition  duration-200 ease-in-out hidden group-hover:scale-110 group-hover:block"
+                                />
+                            </div>
+                        </div>
+                    </div>
                     )
                 }
+                {
+                    file && (
+                        <Button
+                        onClick={() => form.handleSubmit(onSubmit)()}
+                        className="bg-cyan-600 hover:bg-cyan-700 mt-4 w-full"
+                    >
+                        Upload
+                    </Button>
+                    )
+                }
+                
           </div>
 
-
+           
 
         </div>
     )
