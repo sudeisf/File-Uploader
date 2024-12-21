@@ -8,8 +8,19 @@ const path = require('path');
 const authRoute = require('./routes/auth');
 const cors = require('cors');
 
-const prisma = new PrismaClient(); // Initialize Prisma client
+const prisma = new PrismaClient();
 
+
+// Initialize Prisma client
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
+}))
+
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(
@@ -27,18 +38,12 @@ app.use(
   })
 );
 
+app.use('/api/v1', authRoute);
 
-app.use(cors({
-    origin: process.env.CLIENT_URL,
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
-}))
+
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.json());
-app.use('/auth', authRoute);
 
 
 

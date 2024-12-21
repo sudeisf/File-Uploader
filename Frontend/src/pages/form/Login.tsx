@@ -1,7 +1,6 @@
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -15,6 +14,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import axios from 'axios'
 import { toast } from '@/hooks/use-toast'
+import { Link } from 'react-router-dom'
 
 
 const formSchema = z.object({
@@ -37,15 +37,15 @@ const Login = () => {
         try {
             // Correctly access the environment variable
             const API_URL = import.meta.env.VITE_API_URL;
-    
             // Send POST request to the login endpoint
-            const response = await axios.post(`${API_URL}/auth/login`, values, {
+            const response = await axios.post(`${API_URL}/api/v1/login`, values, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                withCredentials: true, // Correct property to allow credentials
+                withCredentials: true
             });
-            if(response.data.success){
+            if(response.data.success === true){
+                localStorage.setItem('token', response.data.token.token);
                 toast({
                     title: "Success",
                     description: "Login successful",
@@ -71,7 +71,7 @@ const Login = () => {
 
 
     return (
-        <div className='mx-auto max-w-sm mt-10'>
+        <div className='mx-auto max-w-sm mt-10 font-mono'>
        <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 flex flex-col ">
         <h1
@@ -106,7 +106,10 @@ const Login = () => {
             )}
         
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit" className='bg-cyan-600 hover:bg-cyan-700'>Submit</Button>
+        <p>
+            <Link to="/Form/Register">dont have an account? <span className='font-bold text-cyan-600 '> Register</span></Link>
+        </p>
       </form>
     </Form>
      </div>

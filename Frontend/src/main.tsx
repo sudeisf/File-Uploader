@@ -7,6 +7,7 @@ import Form from '@/layout/form.tsx'
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Login from './pages/form/Login.tsx'
+import Register from './pages/form/Register.tsx'
 
 
 const router = createBrowserRouter([
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
           {
             path: "Login",  // Use relative path for "/Login"
             element: <Login />,
+          },
+          {
+            path: "Register",  // Use relative path for "/Register"
+            element: <Register />,
           },
         ]
       },

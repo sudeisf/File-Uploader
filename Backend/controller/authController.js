@@ -16,7 +16,7 @@ const loginController = async (req, res) => {
             return res.status(401).send({message: 'Invalid password'});
         }
         const token = await uitls.issueToken(user);
-        return res.status(200).send({token: token});
+        return res.status(200).send({token: token , success: true});
     }catch(e){
         return res.status(500).send({message: e.message});
     }
@@ -29,7 +29,8 @@ const registerController = async (req, res) => {
         const user = await prisma.user.create({
             data: {
                 username: req.body.username,
-                password: hash
+                password: hash,
+                email: req.body.email
             }
         });
         const token = await uitls.issueToken(user);

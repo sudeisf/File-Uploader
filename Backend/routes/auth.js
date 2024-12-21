@@ -6,8 +6,8 @@ const { loginController, registerController} = require('../controller/authContro
 
 
 
-router.get('/register', registerController);
-router.get('/login', loginController);
+router.post('/register', registerController);
+router.post('/login', loginController);
 
 router.get('/logout', (req, res) => {
     req.logout();
