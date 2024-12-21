@@ -8,6 +8,7 @@ import Form from '@/layout/form.tsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Login from './pages/form/Login.tsx'
 import Register from './pages/form/Register.tsx'
+import Home from './pages/Home/home.tsx'
 
 
 const router = createBrowserRouter([
@@ -30,6 +31,9 @@ const router = createBrowserRouter([
         ]
       },
     ]
+  },{
+    path : 'Home',
+    element : <Home />
   }
 ]);
 

@@ -14,7 +14,8 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import axios from 'axios'
 import { toast } from '@/hooks/use-toast'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+
 
 
 const formSchema = z.object({
@@ -25,6 +26,8 @@ const formSchema = z.object({
 })
 
 const Login = () => {
+
+    const Navigate = useNavigate();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -46,6 +49,7 @@ const Login = () => {
             });
             if(response.data.success === true){
                 localStorage.setItem('token', response.data.token.token);
+                Navigate('/Home');
                 toast({
                     title: "Success",
                     description: "Login successful",
@@ -82,7 +86,7 @@ const Login = () => {
           name="username"
           render={({ field }) => (
             <FormItem className='flex flex-col items-start'>
-              <FormLabel>Username</FormLabel>
+              <FormLabel className='text-start font-bold text-lg text-cyan-700'>Username</FormLabel>
               <FormControl>
                 <Input placeholder="username" {...field} />
               </FormControl>
@@ -97,7 +101,7 @@ const Login = () => {
             name='password'
             render={({ field }) => (
                 <FormItem  className='flex flex-col items-start'>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel className='text-start font-bold text-lg text-cyan-700'>Password</FormLabel>
                     <FormControl>
                         <Input placeholder="password" {...field} type="password" />
                     </FormControl>

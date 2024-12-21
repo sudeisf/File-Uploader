@@ -79,7 +79,7 @@ const Register = () => {
                     name="username"
                     render={({ field }) => (
                         <FormItem className='flex flex-col items-start'>
-                            <FormLabel>Username</FormLabel>
+                            <FormLabel className='text-start font-bold text-lg text-cyan-700'>Username</FormLabel>
                             <FormControl>
                                 <Input placeholder="Username" {...field} />
                             </FormControl>
@@ -93,9 +93,9 @@ const Register = () => {
                     name="email"
                     render={({ field }) => (
                         <FormItem className='flex flex-col items-start'>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel className='text-start font-bold text-lg text-cyan-700'>Email</FormLabel>
                             <FormControl>
-                                <Input placeholder="Email" {...field} />
+                                <Input placeholder="Email" {...field} type='email'/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -107,9 +107,9 @@ const Register = () => {
                     name="password"
                     render={({ field }) => (
                         <FormItem className='flex flex-col items-start'>
-                            <FormLabel>Password</FormLabel>
+                            <FormLabel className='text-start font-bold text-lg text-cyan-700'>Password</FormLabel>
                             <FormControl>
-                                <Input placeholder="Password" {...field} />
+                                <Input placeholder="Password" {...field} type='password'/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
