@@ -1,5 +1,5 @@
 const fs = require('fs');
-const Sstorage = require('../config/supabase');
+const Sstorage = require('../config/supabaseConfig');
 
 const uploadFile = async (req, res) => {
     try {
@@ -29,11 +29,11 @@ const uploadFile = async (req, res) => {
             message: 'File uploaded successfully',
             data,
         })
-        
+
     } catch (error) {
         console.error('Internal server error:', error.message);
         return res.status(500).send('Internal server error');
     }
 };
 
-module.exports = uploadFile; // CommonJS syntax for export
+module.exports = {uploadFile}; // CommonJS syntax for export

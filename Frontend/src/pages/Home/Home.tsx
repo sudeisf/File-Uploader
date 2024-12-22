@@ -19,6 +19,7 @@ import { useState } from "react";
 import jpeg from "@/assets/icons/jpg-svgrepo-com.svg";
 import remove from "@/assets/icons/remove.svg";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
 
 
 const fileLimit = 2 * 1024 * 1024; // MB
@@ -56,8 +57,13 @@ const Home = () => {
         resolver: zodResolver(formSchema)
     });
 
-    function onSubmit(data: { file: File }) {
-        console.log("Selected file:", data.file);
+    async function onSubmit(data: { file: File }) {
+        try{
+            const API = import.meta.env.VITE_API_URL;
+            const respose = await axios.post(`${API}/files/upload`, data.file);
+        }catch(err){
+
+        }
     }
     function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
         const file = event.target.files?.[0];

@@ -1,9 +1,18 @@
-const multer = require('multer');
-const upload = multer({storage: multer.memoryStorage()});
 const express = require('express');
 const router = express.Router();
-const uploaderController = require('../controller/uploaderController');
+const multer = require('multer');
+const passport = require('passport');
+const uploaderController = require('../controller/uploadController');
 
-router.post('/files',passport.authenticate('jwt', { session: false }),upload.single('file'), uploaderController.uploadFile);
+// Configure multer for file uploads
+const upload = multer({ dest: 'uploads/' });
 
-module.exports = router;  
+// Define the route with authentication and file upload
+router.post(
+    '/files',
+    passport.authenticate('jwt', { session: false }),
+    upload.single('file'),
+    uploaderController.uploadFile
+);
+
+module.exports = router;

@@ -7,6 +7,7 @@ const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const path = require('path');
 const authRoute = require('./routes/auth');
 const cors = require('cors');
+const fileRoute = require("./routes/uploaderRoutes")
 
 const prisma = new PrismaClient();
 
@@ -39,6 +40,7 @@ app.use(
 );
 
 app.use('/api/v1', authRoute);
+app.use('/files', fileRoute);
 
 
 
