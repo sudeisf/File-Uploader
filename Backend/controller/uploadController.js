@@ -1,7 +1,6 @@
 const fs = require('fs');
 const Sstorage = require('../config/supabaseConfig');
 const { PrismaClient } = require('@prisma/client');
-const { connect } = require('http2');
 const prisma = new PrismaClient();
 
 
@@ -20,7 +19,7 @@ const uploadFile = async (req, res) => {
                 size: file.size,
                 type: file.mimetype,
                 path: file.path,
-                user_id: connect,
+                user_id: req.user.id,
                 folderId: null,
             }
         })

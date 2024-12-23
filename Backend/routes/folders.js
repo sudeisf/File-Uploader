@@ -9,13 +9,11 @@ const {
 } = require('../controller/foldersController');
 
 
-router.post(':folderId',createFolder)
-
-router.get('/',getFolders)
-router.get('/:folderId',getFolder)
-
-router.put('/:folderId',updateFolder)
-router.delete('/:folderId',deleteFolder)
+router.post('/', createFolder);
+router.get('/', getFolders);
+router.get('/:id', getFolder);
+router.put('/:id', updateFolder);
+router.delete('/:id', deleteFolder);
 
 
 module.exports = router;
