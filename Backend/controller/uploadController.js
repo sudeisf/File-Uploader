@@ -1,5 +1,10 @@
 const fs = require('fs');
 const Sstorage = require('../config/supabaseConfig');
+const { PrismaClient } = require('@prisma/client');
+const { connect } = require('http2');
+const prisma = new PrismaClient();
+
+
 
 const uploadFile = async (req, res) => {
     try {
@@ -8,7 +13,17 @@ const uploadFile = async (req, res) => {
         if (!file) {
             return res.status(400).send('Please upload a file');
         }
-
+        
+        await prisma.file.insert({
+            data: {
+                name: file.originalname,    
+                size: file.size,
+                type: file.mimetype,
+                path: file.path,
+                user_id: connect,
+                folderId: null,
+            }
+        })
         const fileContent = fs.readFileSync(file.path);
 
         const { data, error } = await Sstorage.from('files').upload(

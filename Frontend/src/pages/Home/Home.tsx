@@ -20,6 +20,7 @@ import jpeg from "@/assets/icons/jpg-svgrepo-com.svg";
 import remove from "@/assets/icons/remove.svg";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import { finished } from "stream";
 
 
 const fileLimit = 2 * 1024 * 1024; // MB
@@ -60,8 +61,11 @@ const Home = () => {
     async function onSubmit(data: { file: File }) {
         try{
             const API = import.meta.env.VITE_API_URL;
-            const respose = await axios.post(`${API}/files/upload`, data.file);
+            const respose = await axios.post(`${API}/files/upload`, data.file); //not finished
+            console.log(respose); 
+
         }catch(err){
+            console.error(err);
 
         }
     }
