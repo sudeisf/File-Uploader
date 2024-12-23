@@ -14,5 +14,5 @@ router.post(
     upload.single('file'),
     uploaderController.uploadFile
 );
-
+router.get('/files', uploaderController.getFiles);
 module.exports = router;

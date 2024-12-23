@@ -49,5 +49,49 @@ const uploadFile = async (req, res) => {
         return res.status(500).send('Internal server error');
     }
 };
+const getFile = async (req, res) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            return res.status(401).send('Unauthorized');
+        }
+
+             
+        const { fileId } = req.params;
+
+        const file = await prisma.file.findUnique({
+            where: {
+                id: fileId,
+                user_id: user.id,  
+            },
+        });
+
+        if (!file) {
+            return res.status(404).send('File not found');
+        }
+         
+      
+        const { data: foldersData, error: folderError } = await Sstorage.from(file.folderId).list('', { limit: 100 });
+        if (folderError) {
+            console.error('Supabase folder list error:', folderError.message);
+            return res.status(400).send('Failed to fetch folders');
+        }
+
+        const folder = foldersData.find(f => f.name === file.folderId); 
+        
+        if (!folder) {
+            return res.status(404).send('Folder not found');
+        }
+
+        return res.status(200).json({
+            file,
+            folder,
+        });
+
+    } catch (error) {
+        console.error('Internal server error:', error.message);
+        return res.status(500).send('Internal server error');
+    }
+};
 
 module.exports = {uploadFile}; // CommonJS syntax for export
