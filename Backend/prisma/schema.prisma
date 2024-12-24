@@ -38,8 +38,8 @@ model File {
   name      String
   url       String
   size      Int
-  folderId  String   @db.ObjectId
-  folder    Folder   @relation(fields: [folderId], references: [id])
+  folderId String? @db.ObjectId
+  folder   Folder? @relation(fields: [folderId], references: [id])
   createdAt DateTime @default(now())
 }
 

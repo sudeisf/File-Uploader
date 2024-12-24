@@ -42,7 +42,7 @@ app.use(
 );
 
 app.use('/api/v1', authRoute);
-app.use('/files', fileRoute);
+app.use('/f', fileRoute);
 app.use('/folders', folderRoute);
 app.use('/share',shareRoute);
 

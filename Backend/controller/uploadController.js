@@ -12,19 +12,23 @@ const uploadFile = async (req, res) => {
         if (!file) {
             return res.status(400).send('Please upload a file');
         }
-        
-        await prisma.file.insert({
+
+        // Optional: Check if a folderId was provided
+        const folderId = req.body.folderId || null; // Use the provided folder ID or null
+
+        const createdFile = await prisma.file.create({
             data: {
-                name: file.originalname,    
+                name: file.originalname,
                 size: file.size,
-                type: file.mimetype,
-                path: file.path,
-                user_id: req.user.id,
-                folderId: null,
-            }
-        })
+                folder: folderId ? { connect: { id: folderId } } : undefined, // Provide folderId (can be null)
+                url: "abcd/xyz", // URL will be updated after uploading to storage
+            },
+        });
+
+        // Read the file content
         const fileContent = fs.readFileSync(file.path);
 
+        // Upload to Supabase
         const { data, error } = await Sstorage.from('files').upload(
             'files/' + file.originalname,
             fileContent
@@ -35,6 +39,13 @@ const uploadFile = async (req, res) => {
             return res.status(400).send('File upload failed. Please try again later.');
         }
 
+        // Update the file URL in the database
+        await prisma.file.update({
+            where: { id: createdFile.id },
+            data: { url: data.path }, // Use the returned path from Supabase
+        });
+
+        // Remove the local file
         await fs.promises.unlink(file.path).catch((err) => {
             console.error('Failed to delete local file:', err);
         });
@@ -42,13 +53,13 @@ const uploadFile = async (req, res) => {
         return res.status(200).send({
             message: 'File uploaded successfully',
             data,
-        })
-
+        });
     } catch (error) {
         console.error('Internal server error:', error.message);
         return res.status(500).send('Internal server error');
     }
 };
+
 const getFile = async (req, res) => {
     try {
         const user = req.user;
@@ -94,4 +105,4 @@ const getFile = async (req, res) => {
     }
 };
 
-module.exports = {uploadFile}; // CommonJS syntax for export
+module.exports = {uploadFile, getFile}; // CommonJS syntax for export
