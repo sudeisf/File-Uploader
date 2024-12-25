@@ -17,23 +17,9 @@ const uploadFile = async (req, res) => {
             return res.status(400).send('Please upload a file');
         }
 
-        // Optional: Check if a folderId was provided
-        const folderId = req.body.folderId || null; // Use the provided folder ID or null
-
-        const createdFile = await prisma.file.create({
-            data: {
-                name: file.originalname,
-                size: file.size,
-                user_id: user.id,
-                folder: folderId ? { connect: { id: folderId } } : undefined, // Provide folderId (can be null)
-                url: "abcd/xyz", // URL will be updated after uploading to storage
-            },
-        });
-
-        // Read the file content
+        
         const fileContent = fs.readFileSync(file.path);
-
-        // Upload to Supabase
+    
         const { data, error } = await Sstorage.from('files').upload(
             'files/' + file.originalname,
             fileContent
@@ -44,13 +30,19 @@ const uploadFile = async (req, res) => {
             return res.status(400).send('File upload failed. Please try again later.');
         }
 
-        // Update the file URL in the database
-        await prisma.file.update({
-            where: { id: createdFile.id },
-            data: { url: data.path }, // Use the returned path from Supabase
+   
+        const folderId = req.body.folderId || null; 
+
+        await prisma.file.create({
+            data: {
+                name: file.originalname,
+                size: file.size,
+                folder: folderId ? { connect: { id: folderId } } : undefined, 
+                url: data.path, 
+                user: { connect: { id: user.id } },
+            },
         });
 
-        // Remove the local file
         await fs.promises.unlink(file.path).catch((err) => {
             console.error('Failed to delete local file:', err);
         });
