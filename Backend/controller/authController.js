@@ -33,7 +33,7 @@ const registerController = async (req, res) => {
                 email: req.body.email
             }
         });
-        const token = await uitls.issueToken(user);
+        const token = uitls.issueToken(user);
         return res.status(200).send({success: true,token: token});
     } catch(e){
         return res.status(500).send({message: e.message});

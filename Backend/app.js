@@ -47,8 +47,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes (after all middleware is applied)
-app.use('/api/v1', authRoute);
-app.use('/f', fileRoute);
+app.use('/api/auth', authRoute);
+app.use('/api/files', fileRoute);
 app.use('/folders', folderRoute);
 app.use('/share', shareRoute);
 

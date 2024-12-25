@@ -39,7 +39,6 @@ const uploadFile = async (req, res) => {
                 size: file.size,
                 folder: folderId ? { connect: { id: folderId } } : undefined, 
                 url: data.path, 
-                user: { connect: { id: user.id } },
             },
         });
 
