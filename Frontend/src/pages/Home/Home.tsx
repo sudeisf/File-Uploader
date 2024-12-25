@@ -61,8 +61,8 @@ const Home = () => {
     async function onSubmit(data: { file: File }) {
         try{
             const API = import.meta.env.VITE_API_URL;
-            const respose = await axios.post(`${API}/files/upload`, data.file); //not finished
-            console.log(respose); 
+            const respose = await axios.post(`${API}/f/files`, data.file); //not finished
+            console.log(respose.data); 
 
         }catch(err){
             console.error(err);

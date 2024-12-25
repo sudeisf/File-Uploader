@@ -7,6 +7,10 @@ const prisma = new PrismaClient();
 
 const uploadFile = async (req, res) => {
     try {
+        const user = req.user;
+        if (!user) {
+            return res.status(401).send('Unauthorized');
+        }
         const file = req.file;
 
         if (!file) {
@@ -20,6 +24,7 @@ const uploadFile = async (req, res) => {
             data: {
                 name: file.originalname,
                 size: file.size,
+                user_id: user.id,
                 folder: folderId ? { connect: { id: folderId } } : undefined, // Provide folderId (can be null)
                 url: "abcd/xyz", // URL will be updated after uploading to storage
             },

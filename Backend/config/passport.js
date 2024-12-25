@@ -1,28 +1,35 @@
-
-const Stratagy  = require('passport-jwt').Strategy;
+const stratagy  = require('passport-local').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
-const { PrismaClient }  = require('@prisma/client');
-const prismaClient  = new PrismaClient();
+const passport = require('passport');
+const { PrismaClient } = require('@prisma/client');
 
 
-const options = {
+
+
+
+const option = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.JWT_SECRET
+    secretOrKey: 'secret'
 }
 
-passport.use(new Stratagy(options,async (payload, done, done) => {
-    try{
-        const user  = await prismaClient.user.findUnique({
-            where: {id: payload.sub}
-        });
-        if(!user){ 
-            return done(null, false, {message : 'User not found'});
-        }
-        return done(null, user);
-    }catch(e){
-        return done(e, false)
-    }
+const prisma = new PrismaClient();
 
-}));
+
+passport.use(
+    new stratagy(
+        option, async (payload, done) => {
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: payload.id
+                }
+            })
+            if (user) {
+                return done(null, user)
+            } else {
+                return done(null, false)
+            }
+        }
+    )
+)
 
 module.exports = passport;

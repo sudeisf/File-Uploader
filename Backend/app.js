@@ -47,8 +47,6 @@ app.use('/folders', folderRoute);
 app.use('/share',shareRoute);
 
 
-
-app.use(passport.initialize());
 app.use(passport.session());
 
 
