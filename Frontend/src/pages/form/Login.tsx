@@ -15,7 +15,7 @@ import { z } from 'zod'
 import axios from 'axios'
 import { toast } from '@/hooks/use-toast'
 import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+
 
 
 
@@ -49,13 +49,12 @@ const Login = () => {
                 withCredentials: true
             });
             if(response.data.success === true){
-                localStorage.setItem('token', response.data.token.token);
-                Navigate('/Home');
                 toast({
                     title: "Success",
                     description: "Login successful",
                     variant: "default",
                 })
+                Navigate('/Home');
             }
       
             console.log(response.data);

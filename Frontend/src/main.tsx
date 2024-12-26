@@ -8,7 +8,8 @@ import Form from '@/layout/form.tsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Login from './pages/form/Login.tsx'
 import Register from './pages/form/Register.tsx'
-import Home from './pages/Home/home.tsx'
+import Home from '@/pages/Home/Home.tsx'
+import { Toaster } from '@/components/ui/toaster.tsx'
 
 
 const router = createBrowserRouter([
@@ -41,5 +42,6 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
       <RouterProvider router={router} />
+      <Toaster />
   </StrictMode>,
 )

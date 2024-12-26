@@ -7,7 +7,10 @@ const prisma = new PrismaClient();
 
 const uploadFile = async (req, res) => {
     try {
-        const user = req.user;
+      
+        const session = req.session;
+        const user = session.user;
+
         if (!user) {
             return res.status(401).send('Unauthorized');
         }
@@ -39,6 +42,7 @@ const uploadFile = async (req, res) => {
                 size: file.size,
                 folder: folderId ? { connect: { id: folderId } } : undefined, 
                 url: data.path, 
+                user: { connect: { id: user.id } },
             },
         });
 
