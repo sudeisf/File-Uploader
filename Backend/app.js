@@ -33,6 +33,8 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
+      secure: false,
+      httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
     store: new PrismaSessionStore(prisma, {

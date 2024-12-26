@@ -15,6 +15,7 @@ import { z } from 'zod'
 import axios from 'axios'
 import { toast } from '@/hooks/use-toast'
 import { Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 
 
 
@@ -26,7 +27,7 @@ const formSchema = z.object({
 })
 
 const Login = () => {
-
+    
     const Navigate = useNavigate();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -41,7 +42,7 @@ const Login = () => {
             // Correctly access the environment variable
             const API_URL = import.meta.env.VITE_API_URL;
             // Send POST request to the login endpoint
-            const response = await axios.post(`${API_URL}/api/v1/login`, values, {
+            const response = await axios.post(`${API_URL}/api/auth/login`, values, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -56,16 +57,15 @@ const Login = () => {
                     variant: "default",
                 })
             }
-    
-            // Log the response data
+      
             console.log(response.data);
     
-        } catch (err) {
+        } catch (err: any) {
             // Log any errors
-            console.error(err);
+            console.log(err);
             toast({
                 title: "Error",
-                description: "Login failed",
+                description: `${err?.response?.data.message || 'An error occurred'}`,
                 variant: "destructive",
             })
         }
