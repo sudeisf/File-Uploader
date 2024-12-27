@@ -1,17 +1,25 @@
-const fs = require('fs');
+
 const Sstorage = require('../config/supabaseConfig');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const jwt = require('jsonwebtoken');
+const path = require('path');
+const fs = require('fs');
 
+const pathToKey = path.join(__dirname, '../utils/', 'private.pem');
+console.log(pathToKey);
+const PRIV_KEY = fs.readFileSync(pathToKey, 'utf8');
 
 
 const uploadFile = async (req, res) => {
     try {
         const user = req.user;
+        console.log(user);
         if (!user) {
             return res.status(401).send('Unauthorized');
         }
-        const file = req.file;
+        console.log(user);
+        const file = req.file; 
 
         if (!file) {
             return res.status(400).send('Please upload a file');
