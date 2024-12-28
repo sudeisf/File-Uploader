@@ -16,7 +16,7 @@ const loginController = async (req, res) => {
             return res.status(401).send({message: 'Invalid password'});
         }
         const token =  uitls.issueToken(user);
-        res.cookie("token", token);
+        res.cookie("token", token, {httpOnly: true});
         return res.status(200).send({token: token , success: true});
     }catch(e){
         return res.status(500).send({message: e.message});
@@ -35,8 +35,8 @@ const registerController = async (req, res) => {
             }
         });
         const token = uitls.issueToken(user);
-        res.cookie("connect.sid", token);
-        return res.status(200).send({success: true,token: token});
+        res.cookie("token", token, {httpOnly: true});
+        return res.status(200).send({success: true,message: 'User created successfully'});
     } catch(e){
         return res.status(500).send({message: e.message});
     }

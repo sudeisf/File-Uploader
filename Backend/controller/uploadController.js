@@ -5,6 +5,8 @@ const prisma = new PrismaClient();
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const fs = require('fs');
+const { connect } = require('http2');
+const {ObjectID} = require('mongodb');
 
 const pathToKey = path.join(__dirname, '../utils/', 'private.pem');
 console.log(pathToKey);
@@ -14,24 +16,37 @@ const PRIV_KEY = fs.readFileSync(pathToKey, 'utf8');
 const uploadFile = async (req, res) => {
     try {
         const user = req.user;
-        console.log(user);
         if (!user) {
             return res.status(401).send('Unauthorized');
         }
-        console.log(user);
         const file = req.file; 
-
         if (!file) {
             return res.status(400).send('Please upload a file');
         }
-
-        
+        const folderId = req.body.folderId || null; 
         const fileContent = fs.readFileSync(file.path);
-    
         const { data, error } = await Sstorage.from('files').upload(
             'files/' + file.originalname,
             fileContent
         );
+
+
+        if (error) {
+            console.error('Supabase upload error:', error.message);
+            return res.status(400).send('File upload failed. Please try again later.');
+        }
+        const userID = JSON.stringify(user.sub);
+        await prisma.file.create({
+            data: {
+              name: file.originalname,
+              size: file.size,
+              folder: folderId ? { connect: { id: folderId } } : undefined,
+              url: data.path,
+              userId:user.sub
+               // directly use user.sub as a string
+            },
+          });
+          
 
         if (error) {
             console.error('Supabase upload error:', error.message);
@@ -39,16 +54,7 @@ const uploadFile = async (req, res) => {
         }
 
    
-        const folderId = req.body.folderId || null; 
 
-        await prisma.file.create({
-            data: {
-                name: file.originalname,
-                size: file.size,
-                folder: folderId ? { connect: { id: folderId } } : undefined, 
-                url: data.path, 
-            },
-        });
 
         await fs.promises.unlink(file.path).catch((err) => {
             console.error('Failed to delete local file:', err);

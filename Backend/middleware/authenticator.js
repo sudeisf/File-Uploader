@@ -9,7 +9,8 @@ const SECRET_KEY = fs.readFileSync(pathToPrivateKey, 'utf8');
 const authenticateUser = async (req, res, next) => {
     const cookie = req.headers.cookie;
     const cookies = cookieParser.parse(cookie);
-    const token = cookies['connect.sid'];
+    const token = cookies['token'];
+
     let jsonString = token.replace(/^j:/, '');
     let cookieJson = JSON.parse(jsonString);
     let tokenFromCookie = cookieJson['token'];
@@ -29,6 +30,7 @@ const authenticateUser = async (req, res, next) => {
         console.log(req.user); // Attach user to the request
         next();
     });
+
 }
 
 module.exports = authenticateUser;
