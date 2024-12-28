@@ -47,7 +47,7 @@ app.use(passport.session());
 // Routes
 app.use('/api/auth', authRoute);
 app.use('/api/files', fileRoute);
-app.use('/folders', folderRoute);
+app.use('/api/folders', folderRoute);
 app.use('/share', shareRoute);
 
 // Start server

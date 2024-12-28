@@ -2,11 +2,10 @@
 const Sstorage = require('../config/supabaseConfig');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const jwt = require('jsonwebtoken');
+
 const path = require('path');
 const fs = require('fs');
-const { connect } = require('http2');
-const {ObjectID} = require('mongodb');
+
 
 const pathToKey = path.join(__dirname, '../utils/', 'private.pem');
 console.log(pathToKey);

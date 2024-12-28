@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const authenticateUser = require('../middleware/authenticator');
 
 const {
     createFolder,
@@ -9,11 +10,25 @@ const {
 } = require('../controller/foldersController');
 
 
-router.post('/', createFolder);
-router.get('/', getFolders);
-router.get('/:id', getFolder);
-router.put('/:id', updateFolder);
-router.delete('/:id', deleteFolder);
+router.post('/create-folder',
+    authenticateUser,
+    createFolder);
+
+router.get('/', 
+    authenticateUser,
+    getFolders);
+
+router.get('/:id', 
+    authenticateUser,
+    getFolder);
+
+router.put('/:id', 
+    authenticateUser,
+    updateFolder);
+
+router.delete('/:id',
+     authenticateUser,
+     deleteFolder);
 
 
 module.exports = router;

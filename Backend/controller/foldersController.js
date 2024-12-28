@@ -1,31 +1,32 @@
-const{prismaClient} = require('@prisma/client');
+const{PrismaClient} = require('@prisma/client');
 const storage = require('../config/supabaseConfig');
+const prisma = new PrismaClient();
 
-const createFolder = async (req, res) => {
+const  createFolder = async (req, res) => {
     try {
-        const { name } = req.body;
+        const name = req.body.name;
+        console.log(name);
         const user = req.user;
         if(!user){
             return res.status(401).send('Unauthorized');
         }
-        const exstingFolder = await prismaClient.folder.findFirst({
+        const exstingFolder = await prisma.folder.findFirst({
             where: {
                 name: name,
-                user_id: user.id,
+                userId: user.sub,
             },
         });
         if (exstingFolder) {
             return res.status(400).send('Folder already exists');
         }
-        const folder = await prismaClient.folder.create({
+        const folder = await prisma.folder.create({
             data: {
-                name: name,
-                user_id: user.id,
+                userId: user.sub,
+                name: name
             },
         });
-
         const { data, error } = await storage.createBucket(folder.id, {
-            public: false, 
+            public: true, 
         });
 
         if (error) {    
@@ -59,7 +60,7 @@ const getFolders = async (req, res) => {
             return res.status(401).send('Unauthorized');
         }    
         
-        const folders = await prismaClient.folder.findMany({   
+        const folders = await prisma.folder.findMany({   
             where: {
                 user_id: user.id,
             },
@@ -94,7 +95,7 @@ const getFolder = async (req, res) => {
         if(!user){
             return res.status(401).send('Unauthorized');
         }    
-        const folder = await prismaClient.folder.findUnique({
+        const folder = await PrismaClient.folder.findUnique({
             where: {
                 id: req.params.id,
             },
@@ -132,7 +133,7 @@ const updateFolder = async (req, res) => {
         if(!user){
             return res.status(401).send('Unauthorized');
         }    
-        const folder = await prismaClient.folder.update({
+        const folder = await PrismaClient.folder.update({
             where: {
                 id: req.params.id,
             },
@@ -157,7 +158,7 @@ const deleteFolder = async (req, res) => {
         if(!user){
             return res.status(401).send('Unauthorized');
         }    
-        const folder = await prismaClient.folder.findUnique({
+        const folder = await PrismaClient.folder.findUnique({
             where: {
                 id: req.params.id,
             },
@@ -188,7 +189,7 @@ const deleteFolder = async (req, res) => {
             return res.status(400).send('Failed to delete folder');
         }
 
-        await prismaClient.folder.delete({
+        await PrismaClient.folder.delete({
             where: {
                 id: req.params.id,
             },
