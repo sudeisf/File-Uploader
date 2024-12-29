@@ -25,16 +25,17 @@ const  createFolder = async (req, res) => {
                 name: name
             },
         });
-        const { data, error } = await storage.createBucket(folder.id, {
-            public: true, 
-        });
-
-        if (error) {    
-            console.error('Supabase create bucket error:', error.message);
-            return res.status(400).send('Failed to create folder');
-        }
 
         if(folder){
+
+            const { data, error } = await storage.createBucket(folder.name, {
+                public: true, 
+            });
+    
+            if (error) {    
+                console.error('Supabase create bucket error:', error.message);
+                return res.status(400).send('Failed to create folder');
+            }
             return res.status(200).json({
                 message: 'Folder created successfully',
                 folder,
@@ -53,79 +54,87 @@ const  createFolder = async (req, res) => {
 
 
 
-const getFolders = async (req, res) => {    
+const getFolders = async (req, res) => {
     try {
         const user = req.user;
-        if(!user){
+        if (!user) {
             return res.status(401).send('Unauthorized');
-        }    
-        
-        const folders = await prisma.folder.findMany({   
+        }
+
+        const folders = await prisma.folder.findMany({
             where: {
-                user_id: user.id,
-            },
+                userId: user.id,
+            }
         });
 
-        if(!folders || folders.length === 0){
+        if (!folders || folders.length === 0) {
             return res.status(404).send('No folders found');
         }
 
         const folderDetails = await Promise.all(
             folders.map(async (folder) => {
-                const {data, error} = await storage.from('folders').list('',{limit : 100});
-                if(error){
-                    console.error('Supabase list bucket error:', error.message);
-                    return {...folder, files: []};
-               }
-               return {...folder, files: data};
+                const buckname = folder.name;
+                console.log(`Fetching files for bucket: ${buckname}`);
+
+                try {
+                 
+                    const { data, error } = await storage
+                        .from(buckname)
+                        .list('', { limit: 100 });
+
+                    if (error) {
+                        console.error('Error fetching files:', error.message);
+                        return {
+                            ...folder,
+                            files: [{
+                                name: 'error',
+                                size: 0,
+                                url: 'error',
+                                type: 'error',
+                            }],
+                        };
+                    }
+
+                    // If no files are returned, log and return empty files
+                    if (!data || data.length === 0) {
+                        console.log(`No files found in bucket: ${buckname}`);
+                        return {
+                            ...folder,
+                            files: [],
+                        };
+                    }
+
+                    // Optionally sort the files by name (or any other criteria)
+                    const sortedFiles = data.sort((a, b) => a.name.localeCompare(b.name));
+
+                    return {
+                        ...folder,
+                        files: sortedFiles,
+                    };
+
+                } catch (error) {
+                    console.error('Error processing bucket:', error.message);
+                    return {
+                        ...folder,
+                        files: [{
+                            name: 'error',
+                            size: 0,
+                            url: 'error',
+                            type: 'error',
+                        }],
+                    };
+                }
             })
-        )
+        );
 
-        return res.status(200).json(folderDetails);
-    } catch (error) {
-        console.error('Internal server error:', error.message);
-        return res.status(500).send('Internal server error');
-    }
-}   
-
-const getFolder = async (req, res) => {    
-    try {
-
-        const user = req.user;
-        if(!user){
-            return res.status(401).send('Unauthorized');
-        }    
-        const folder = await PrismaClient.folder.findUnique({
-            where: {
-                id: req.params.id,
-            },
-        });
-
-       // Check if the folder exists and belongs to the user
-       if (!folder || folder.user_id !== user.id) {
-        return res.status(404).send('Folder not found or access denied');
-    }
-
-
-        const { data, error } = await storage.from(folder.id).list('', {limit: 100});
-        if(error){
-            console.error('Supabase list bucket error:', error.message);
-            return {...folder, files: []};
-        }
-        const folderDetails = {
-            ...folder,
-             files: data
-            };
-        
-            
         return res.status(200).json(folderDetails);
 
     } catch (error) {
         console.error('Internal server error:', error.message);
         return res.status(500).send('Internal server error');
     }
-}   
-``
+};
+
 
 const updateFolder = async (req, res) => {    
     try {
@@ -206,7 +215,6 @@ const deleteFolder = async (req, res) => {
 module.exports = {
     createFolder, 
     getFolders, 
-    getFolder, 
     deleteFolder, 
     updateFolder
 }; 
