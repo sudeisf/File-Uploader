@@ -77,7 +77,7 @@ const getFolders = async (req, res) => {
                 console.log(`Fetching files for bucket: ${buckname}`);
 
                 try {
-                 
+                    // Fetch the files from the specified bucket
                     const { data, error } = await storage
                         .from(buckname)
                         .list('', { limit: 100 });
