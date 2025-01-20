@@ -13,11 +13,12 @@ const shareRoute = require("./routes/share");
 const prisma = new PrismaClient();
 
 app.use(cors({
-  origin: 'http://localhost:5173',  // The origin you're allowing
-  credentials: true,               // Allow credentials like cookies
-  allowedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie', 'Cookie',"application/json"],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
+  origin: 'http://localhost:5173',  // Allow frontend origin
+  credentials: true,               // Allow cookies
+  allowedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie'],  // Ensure headers are correct
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],               // Allowed methods
 }));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

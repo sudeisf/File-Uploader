@@ -28,10 +28,8 @@ const  createFolder = async (req, res) => {
 
         if(folder){
 
-            const { data, error } = await storage.createBucket(folder.name, {
-                public: true, 
-            });
-    
+            const placeHolderFile = new Blob(["placeholder file"], { type: 'text/plain' });
+            const { data, error } = await storage.from("users-files").upload(`$${user.sub}/${folder.name}/readme.txt`, placeHolderFile);
             if (error) {    
                 console.error('Supabase create bucket error:', error.message);
                 return res.status(400).send('Failed to create folder');
@@ -73,14 +71,12 @@ const getFolders = async (req, res) => {
 
         const folderDetails = await Promise.all(
             folders.map(async (folder) => {
-                const buckname = folder.name;
-                console.log(`Fetching files for bucket: ${buckname}`);
-
+                const foldername = folder.name;
                 try {
                     // Fetch the files from the specified bucket
                     const { data, error } = await storage
-                        .from(buckname)
-                        .list('', { limit: 100 });
+                        .from("users-files")
+                        .list(`$${user.sub}/${foldername}`, { limit: 100 });
 
                     if (error) {
                         console.error('Error fetching files:', error.message);
@@ -151,6 +147,8 @@ const updateFolder = async (req, res) => {
             },
         });
         
+        const {data: files, error: listError } = await storage.from("users-files").update(`$${user.sub}/${folder.name}`, req.body.name);
+
         return res.status(200).json(folder);
        
     } catch (error) {
@@ -177,7 +175,7 @@ const deleteFolder = async (req, res) => {
         if (!folder || folder.user_id !== user.id) {
             return res.status(404).send('Folder not found or access denied');
         }
-        const { data: files, error: listError } = await storage.from(folder.id).list('', { limit: 100 });
+        const { data: files, error: listError } = await storage.from('users-files').list('',{ limit: 100 , recursive: true });
         if(listError){
             console.error('Supabase list bucket error:', filesError.message);
             return res.status(400).send('Failed to delete folder');
@@ -185,7 +183,7 @@ const deleteFolder = async (req, res) => {
     
         if(files.length > 0){
             const filePath  = files.map((file) => file.name);
-            const {error: deleteFileError}  = await storage.from(folder.id).remove(filePath);
+            const {error: deleteFileError}  = await storage.from('users-files').remove();
             if(deleteFileError){
                 console.error('Supabase delete file error:', deleteFileError.message);
                 return res.status(400).send('Failed to delete folder');
