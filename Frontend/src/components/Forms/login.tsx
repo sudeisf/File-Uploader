@@ -5,6 +5,9 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
 import { Link } from "react-router-dom"
+import axios from "axios"
+import { useToast } from "@/hooks/use-toast"
+import { useNavigate } from "react-router-dom"
 
 const formSchema = z.object({
     username: z.string().min(3),
@@ -13,6 +16,10 @@ const formSchema = z.object({
 
 
 export default function Login() {
+
+    const { toast  } = useToast();
+    const navigate = useNavigate();
+
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -23,8 +30,27 @@ export default function Login() {
     })
 
 
-    function onSubmit(values: z.infer<typeof formSchema>) { 
-        console.log(values)
+   async function onSubmit(values: z.infer<typeof formSchema>) { 
+        try{
+            const API_URL  = import.meta.env.VITE_API_URL;
+            const response  = await axios.post(`${API_URL}/api/auth/login`, values ,{withCredentials: true});
+            const data = response.data;
+            if(data.success){
+                toast({
+                    title: "Success",
+                    description: data.message,
+                    variant: "default",
+                })
+                navigate("/");
+            }
+        }catch(e: any){
+            console.log(e)
+            toast({
+                title: "Error",
+                description: e.response.data.message,
+                variant: "destructive",
+            })
+        }
     }
 
 

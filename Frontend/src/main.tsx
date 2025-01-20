@@ -5,6 +5,8 @@ import App from './App.tsx'
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Login from './components/Forms/login.tsx';
 import Register from './components/Forms/SignIn.tsx';
+import { Toaster } from './components/ui/toaster.tsx';
+
 
 const router  = createBrowserRouter([
   {
@@ -25,6 +27,7 @@ const router  = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+       <RouterProvider router={router} />
+       <Toaster />
   </StrictMode>,
 )

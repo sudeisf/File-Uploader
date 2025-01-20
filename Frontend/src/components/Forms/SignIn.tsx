@@ -4,6 +4,9 @@ import {z} from "zod"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {  useForm } from "react-hook-form"
 import { Form , FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
+import axios from "axios"
+import { useToast } from "@/hooks/use-toast"
+import { useNavigate } from "react-router-dom"
 
 
 const formSchema = z.object({
@@ -14,7 +17,8 @@ const formSchema = z.object({
 
 
 export default function Register() {
-
+    const {toast  } = useToast();
+    const navigate = useNavigate();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -25,8 +29,27 @@ export default function Register() {
     })
 
 
-    function onSubmit(values: z.infer<typeof formSchema>) { 
-        console.log(values)
+    async function onSubmit(values: z.infer<typeof formSchema>) { 
+        try{
+            const API = import.meta.env.VITE_API_URL;
+            const response = await axios.post(`${API}/api/auth/register`, values ,{withCredentials: true});
+            const data = response.data;
+            if(data.success){
+                toast({
+                    title: "Success",
+                    description: data.message,
+                    variant: "default",
+                })
+                navigate("/login");
+            }
+        }catch(e: any){
+            console.log(e)
+            toast({
+                title: "Error",
+                description: e.response.data.message,
+                variant: "destructive",
+            })      
+        }
     }
 
 
@@ -74,10 +97,10 @@ export default function Register() {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full">Sign In</Button>
+                <Button type="submit" className="w-full">Register</Button>
                 <div className="flex justify-center gap-2">
                     <p className="text-center">have an account?</p>
-                     <a href="/login">Login</a>
+                     <a href="/login">sign in</a>
                 </div>
             </form>
         </Form>
