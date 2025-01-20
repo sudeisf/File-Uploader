@@ -1,3 +1,4 @@
+import { Outlet } from "react-router-dom"
 
 
 function App() {
@@ -5,9 +6,7 @@ function App() {
 
   return (
     <>
-      <div>
-          sddfgh
-        </div>
+        <Outlet />
     </>
   )
 }
