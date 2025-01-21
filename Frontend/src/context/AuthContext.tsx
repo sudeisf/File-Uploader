@@ -25,18 +25,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return storedIsLoggedIn === "true";
   });
 
-  const { data } = useQuery("authStatus", fetchAuthStatus, {
-    refetchOnWindowFocus: false,
-    staleTime: 5 * 60 * 1000,
-    onSuccess: (data) => {
-      setIsLoggedIn(data.success);
-      localStorage.setItem("isLoggedIn", String(data.success));
-    },
-    onError: () => {
-      setIsLoggedIn(false);
-      localStorage.removeItem("isLoggedIn");
-    },
-  });
+  useQuery("authStatus", fetchAuthStatus, {
+        refetchOnWindowFocus: false,
+        staleTime: 5 * 60 * 1000,
+        onSuccess: (data) => {
+            setIsLoggedIn(data.success);
+            localStorage.setItem("isLoggedIn", String(data.success));
+        },
+        onError: () => {
+            setIsLoggedIn(false);
+            localStorage.removeItem("isLoggedIn");
+        },
+    });
 
   const logout = async () => {
     try {
