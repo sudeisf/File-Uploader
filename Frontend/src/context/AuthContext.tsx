@@ -1,47 +1,72 @@
-
-import { createContext, useState } from "react";
 import axios from "axios";
-import React from "react";
-
+import { createContext, useContext, useState } from "react";
+import { useQuery, QueryClient, QueryClientProvider } from "react-query";
 
 type AuthContextType = {
-    isLoggedIn: boolean;
-    setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
-    logout: () => void;
+  isLoggedIn: boolean;
+  setIsLoggedIn: (isLoggedIn: boolean) => void;
+  logout: () => Promise<void>;
 };
-
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+const queryClient = new QueryClient();
 
-    const Logout = async () => {
-        try{
-            const API_URL =  import.meta.env.VITE_API_URL;
-            const respose  = await axios.get(`${API_URL}/api/auth/logout` ,{withCredentials: true});
-            const data =  respose.data;
-            if(data.success) {
-                setIsLoggedIn(false);
-            }
-        }catch(e: any){
-            console.log(e)
-        }
+const fetchAuthStatus = async (): Promise<{ success: boolean }> => {
+  const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/Protected`, {
+    withCredentials: true,
+  });
+  return response.data;
+};
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    const storedIsLoggedIn = localStorage.getItem("isLoggedIn");
+    return storedIsLoggedIn === "true";
+  });
+
+  const { data } = useQuery("authStatus", fetchAuthStatus, {
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000,
+    onSuccess: (data) => {
+      setIsLoggedIn(data.success);
+      localStorage.setItem("isLoggedIn", String(data.success));
+    },
+    onError: () => {
+      setIsLoggedIn(false);
+      localStorage.removeItem("isLoggedIn");
+    },
+  });
+
+  const logout = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
+        withCredentials: true,
+      });
+      const data = response.data;
+      if (data.success) {
+        setIsLoggedIn(false);
+        localStorage.removeItem("isLoggedIn");
+        queryClient.invalidateQueries("authStatus");
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
     }
+  };
 
-    return (
-        <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, logout: Logout }}>
-            {children}
-        </AuthContext.Provider>
-    )
+  return (
+    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 const useAuth = () => {
-    const context = React.useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error("useAuth must be used within a AuthProvider");
-    }
-    return context;
-}
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
 
-export { useAuth };
+export { useAuth, QueryClientProvider, queryClient };

@@ -8,6 +8,7 @@ import { Link } from "react-router-dom"
 import axios from "axios"
 import { useToast } from "@/hooks/use-toast"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/context/AuthContext"
 
 const formSchema = z.object({
     username: z.string().min(3),
@@ -19,6 +20,7 @@ export default function Login() {
 
     const { toast  } = useToast();
     const navigate = useNavigate();
+    const {setIsLoggedIn} = useAuth();
 
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -41,7 +43,9 @@ export default function Login() {
                     description: data.message,
                     variant: "default",
                 })
-                navigate("/");
+                setIsLoggedIn(true);
+                localStorage.setItem("isLoggedIn", "true"); // Save to localStorage
+                navigate("/protected/home");
             }
         }catch(e: any){
             console.log(e)
