@@ -19,7 +19,7 @@ import Uploader from "@/components/Uploader/Uploader"
 
 export default function Home() {
   return (
-    <Tabs defaultValue="upload" className="w-[800px] mx-auto mt-10">
+    <Tabs defaultValue="upload" className="w-[90%] max-w-[800px] mx-auto mt-10">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="upload" className="uppercase">Upload</TabsTrigger>
         <TabsTrigger value="password">Password</TabsTrigger>
