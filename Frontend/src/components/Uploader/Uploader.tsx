@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Input } from "../ui/input"
 import uploder from '@/assets/uploader.svg'
-import {z} from "zod"
+import {set, z} from "zod"
 import { toast } from "@/hooks/use-toast";
 import svg from '@/assets/svg-svgrepo-com.svg'
 import docx from '@/assets/docx-file-format-symbol-svgrepo-com.svg'
@@ -10,6 +10,7 @@ import png from '@/assets/png-file-type-svgrepo-com.svg'
 import jpg from '@/assets/jpeg-svgrepo-com.svg'
 import cance from '@/assets/remove-circle-svgrepo-com.svg'
 import { Button } from "../ui/button";
+import CreateFolder from "../dialog/createFolder";
 
 
 
@@ -55,6 +56,49 @@ export default function Uploader() {
     const [file, setFile] = useState<File | null>(null);
     const [fileIcon, setFileIcon] = useState<string | undefined>(undefined);
     const fileInputref = useRef<HTMLInputElement>(null);
+    const [dragActive, setDragActive] = useState(false);
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(true);
+    };
+    const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setDragActive(false);
+    
+      // Ensure files are dropped
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        const droppedFile = e.dataTransfer.files[0];
+        const icon = setFileIconFunction(droppedFile);
+    
+        // Perform Zod validation
+        try {
+          formSchema.parse({ file: droppedFile });
+          setFile(droppedFile);
+          setFileIcon(icon || undefined);
+          toast({
+            title: "Success",
+            description: `${droppedFile.name} uploaded successfully`,
+            variant: "default",
+          });
+        } catch (error: any) {
+          toast({
+            title: "Error",
+            description: error.errors[0].message,
+            variant: "destructive",
+          });
+        }
+      }
+    };
+    
+
     const handleFileUpload = () => {
         if (fileInputref.current) {
           fileInputref.current.click();
@@ -71,13 +115,12 @@ export default function Uploader() {
         const selectedFile = e.target.files?.[0];
         if (!selectedFile) return;
         const icon = setFileIconFunction(selectedFile);
-        setFileIcon(icon || undefined);
-        console.log(selectedFile);
-    
+      
         // Perform Zod validation
         try {
           formSchema.parse({ file: selectedFile });
           setFile(selectedFile);
+          setFileIcon(icon || undefined);
           toast({
             title: "Success",
             description: `${selectedFile.name} uploaded successfully`,
@@ -91,33 +134,44 @@ export default function Uploader() {
           });
         }
       };
+      
 
      
       
 
     return (
-        <div className="w-full h-full max-h-[600px]
-         bg-gray-100 pt-8 rounded-lg border-2 shadow-sm">
+      <div className="w-full h-full max-h-[700px] bg-[#f5f3f3a3] p-2 rounded-lg  shadow-sm">
 
-          <div className="relative w-[90%] mx-auto mb-4 bg-white rounded-xl border-dotted border-[.2rem] border-[#bebdbd] "
-                onClick={handleFileUpload}>
-                <div className="flex flex-col items-center h-[300px] ">
-                    <img src={uploder} alt="uploader" className="mx-auto my-10 w-20 h-20 " />
-                    <p>Drag and drop a file or click to upload</p>
-                    <p>file limit 2mb</p>
+        <div className="w-full h-full max-h-[700px]
+         bg-[#ffffff] pt-8 rounded-lg border-2 shadow-sm">
+          <div className="w-full mx-auto  bg-[#ffffff]  rounded-lg p-4 mb-4">
+              <div className="relative w-[95%] mx-auto mb-4 mt-4 bg-white rounded-xl border-dotted border-[.2rem] border-[#d7d7d7] "
+                    onClick={handleFileUpload}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    >
+                    <div className="flex flex-col items-center h-[300px] ">
+                        <img src={uploder} alt="uploader" className="mx-auto my-10 w-20 h-20 " />
+                        <p>Drag and drop a file or click to upload</p>
+                        <p>file limit 2mb</p>
+                    </div>
+                    <Input 
+                        ref={fileInputref} 
+                        type="file" 
+                        onChange={handleFileChange}  
+                        className=" hidden w-full  cursor-pointer"  />
                 </div>
-                <Input 
-                    ref={fileInputref} 
-                    type="file" 
-                    onChange={handleFileChange}  
-                    className=" hidden w-full  cursor-pointer"  />
-            </div>
+          </div>
+
+                
+          
 
           <div>
             {
                 file && (
-                  <div className="w-[90%] mx-auto">
-                     <div className="flex items-center justify-between bg-white  mx-auto mt-4 mb-5 py-4 px-8 rounded-xl border-2 shadow-sm group ">
+                  <div className=" mx-auto">
+                     <div className="flex items-center justify-between w-[90%] bg-white  mx-auto mt-4 mb-5 py-4 px-8 rounded-xl border-2 shadow-sm group ">
 
                       <div className="flex">
                         
@@ -150,15 +204,22 @@ export default function Uploader() {
                         </button>
                       </div>
                       </div>
+                      
 
-                      <Button 
-                      className="w-full mx-auto mt-2 mb-5 py-4">Upload</Button>
+                     
                   </div>
                    
                 )
             }
+            <div className="mx-auto flex justify-end  space-x-4 mb-2  bg-[#ffffff] p-2  border-t-2 "> 
+                        <Button variant="outline" className="w-[110px]">Discard</Button>
+                        <CreateFolder  />
+                      
+                   </div>
           </div>
           
         </div>
+      </div>
+
     )
 }
