@@ -29,14 +29,16 @@ const  createFolder = async (req, res) => {
         if(folder){
 
             const placeHolderFile = new Blob(["placeholder file"], { type: 'text/plain' });
-            const { data, error } = await storage.from("users-files").upload(`$${user.sub}/${folder.name}/readme.txt`, placeHolderFile);
-            if (error) {    
+            const { data, error } = await storage.from("users-files").upload(
+                `${user.sub}/${folder.name}/readme.txt`, placeHolderFile
+            );if (error) {    
                 console.error('Supabase create bucket error:', error.message);
                 return res.status(400).send('Failed to create folder');
             }
             return res.status(200).json({
+                success: true,
                 message: 'Folder created successfully',
-                folder,
+                folderID : folder.id,
                 storageBucket: data, 
             });
         }

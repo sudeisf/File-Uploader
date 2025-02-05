@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 
 const path = require('path');
 const fs = require('fs');
+const { Int32 } = require('bson');
 
 
 const pathToKey = path.join(__dirname, '../utils/', 'private.pem');
@@ -13,6 +14,13 @@ const PRIV_KEY = fs.readFileSync(pathToKey, 'utf8');
 
 
 const uploadFile = async (req, res) => {
+    const reqObj = {
+        id : req.folderID,
+        fileD : req.file,
+        folder : req.folder
+    }
+
+    console.log(req.reqObj)
     try {
         const user = req.user;
         if (!user) {
@@ -22,10 +30,10 @@ const uploadFile = async (req, res) => {
         if (!file) {
             return res.status(400).send('Please upload a file');
         }
-        const folderId = req.body.folderId || null; 
+        const folderName = req.body.folder; 
         const fileContent = fs.readFileSync(file.path);
-        const { data, error } = await Sstorage.from('files').upload(
-            'files/' + file.originalname,
+        const { data, error } = await Sstorage.from("users-files").upload(
+            `${user.sub}/${folderName}/${file.originalname}`, // Ensure proper path,
             fileContent
         );
 
@@ -35,13 +43,13 @@ const uploadFile = async (req, res) => {
             return res.status(400).send('File upload failed. Please try again later.');
         }
         const userID = JSON.stringify(user.sub);
+        const folderID = JSON.stringify(req.folderID)
         await prisma.file.create({
             data: {
-              name: file.originalname,
-              size: file.size,
-              folder: folderId ? { connect: { id: folderId } } : undefined,
+              folderId: folderID ? { connect: { id: folderID } } : undefined,
               url: data.path,
-              userId:user.sub
+              userId:user.sub,
+              size: parseInt(file.size,10)
                // directly use user.sub as a string
             },
           });
