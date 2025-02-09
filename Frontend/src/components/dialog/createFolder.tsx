@@ -29,6 +29,7 @@ export default function CreateFolder({ file }: Props) {
   const [selectedFolder, setSelectedFolder] = useState<string>("")
   const [isFolderCreated, setFolderCreated] = useState<boolean>(false)
   const [folderId,setFolderId] = useState<string>('')
+  const [creatBtnDisable, serCreateBtnDisable] = useState<boolean>(false)
 
   const handleFolderChange = (folder: string) => {
     setSelectedFolder(folder)
@@ -54,6 +55,7 @@ export default function CreateFolder({ file }: Props) {
           description: 'Folder created successfully',
           variant: "default",
         })
+        serCreateBtnDisable(true)
       }
     } catch (err) {
       console.error(err)
@@ -93,6 +95,8 @@ export default function CreateFolder({ file }: Props) {
           description: 'File uploaded successfully',
           variant: "default",
         })
+        setFolderCreated(false)
+        setSelectedFolder("")
       }
     } catch (err) {
       console.log(err)
@@ -153,7 +157,7 @@ export default function CreateFolder({ file }: Props) {
             <Button
               onClick={createFolderHandler}
               className="w-[95px] h-8 rounded-sm text-[.9rem] font-Rubic"
-              disabled={!(folderName || selectedFolder)} // Disable if neither is provided
+              disabled={creatBtnDisable || selectedFolder !== ""}
             >
               Create
             </Button>

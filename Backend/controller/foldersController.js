@@ -134,6 +134,40 @@ const getFolders = async (req, res) => {
 };
 
 
+const getFoldersName = async (req, res) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            return res.status(401).send('Unauthorized');
+        }
+
+        const folders = await prisma.folder.findMany({
+            where: {
+                userId: user.id,
+            },
+            select: {
+                name: true, // Only select the folder names
+            }
+        });
+
+        if (!folders || folders.length === 0) {
+            return res.status(404).send('No folders found');
+        }
+
+        // Only return folder names
+        const folderNames = folders.map(folder => folder.name);
+
+        return res.status(200).json(folderNames);
+
+    } catch (error) {
+        console.error('Internal server error:', error.message);
+        return res.status(500).send('Internal server error');
+    }
+};
+
+
+
+
 const updateFolder = async (req, res) => {    
     try {
         const user = req.user;
@@ -216,5 +250,6 @@ module.exports = {
     createFolder, 
     getFolders, 
     deleteFolder, 
-    updateFolder
+    updateFolder,
+    getFoldersName
 }; 

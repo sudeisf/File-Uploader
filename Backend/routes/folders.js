@@ -6,12 +6,18 @@ const {
     getFolders,
     updateFolder,
     deleteFolder,
+    getFoldersName
 } = require('../controller/foldersController');
 
 
 router.post('/create-folder',
     authenticateUser,
     createFolder);
+
+router.get('/get-folders-names',
+    authenticateUser,
+    getFoldersName
+    );
 
 router.get('/folder-list', 
     authenticateUser,
