@@ -5,7 +5,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import file from '@/assets/pngIcon.svg';
-import minus from '@/assets/🦆 icon _minus_.svg'
 import {
   Card,
   CardContent,
@@ -22,8 +21,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import Uploader from "@/components/Uploader/Uploader"
-import { nan } from "zod";
-import { ChevronDown, Delete, Download, EllipsisVertical, Folder, Menu, Minus, Share, Trash } from "lucide-react";
+import { Download, EllipsisVertical, Folder, Share, Trash } from "lucide-react";
 
 
 import {
@@ -31,8 +29,6 @@ import {
   MenubarContent,
   MenubarItem,
   MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
   MenubarTrigger,
 } from "@/components/ui/menubar"
 
