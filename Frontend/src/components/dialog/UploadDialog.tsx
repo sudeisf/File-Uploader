@@ -30,6 +30,7 @@ export default function UploadComponet({ file }: Props) {
   const [isFolderCreated, setFolderCreated] = useState<boolean>(false)
   const [folderId,setFolderId] = useState<string>('')
   const [creatBtnDisable, serCreateBtnDisable] = useState<boolean>(false)
+  const [isOpen , setIsOpen] = useState<boolean>(false)
 
   const handleFolderChange = (folder: string) => {
     setSelectedFolder(folder)
@@ -97,6 +98,7 @@ export default function UploadComponet({ file }: Props) {
         })
         setFolderCreated(false)
         setSelectedFolder("")
+        setIsOpen(false);
       }
     } catch (err) {
       console.log(err)
@@ -109,13 +111,12 @@ export default function UploadComponet({ file }: Props) {
   }
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
-          className="justify-end">
-            <img src={add} alt="add btn" className="w-5"/>
-            upload
-        </Button>
+      <Button onClick={() => setIsOpen(true)} className="justify-end">
+        <img src={add} alt="add btn" className="w-5" />
+        Upload
+      </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
