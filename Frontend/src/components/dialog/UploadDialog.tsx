@@ -24,7 +24,7 @@ interface Props {
 
 }
 
-export default function CreateFolder({ file }: Props) {
+export default function UploadComponet({ file }: Props) {
   const [folderName, setFolderName] = useState<string>("")
   const [selectedFolder, setSelectedFolder] = useState<string>("")
   const [isFolderCreated, setFolderCreated] = useState<boolean>(false)

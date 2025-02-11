@@ -10,7 +10,7 @@ import png from "@/assets/png-file-type-svgrepo-com.svg";
 import jpg from "@/assets/jpeg-svgrepo-com.svg";
 import cancelIcon from "@/assets/remove-circle-svgrepo-com.svg";
 import { Button } from "../ui/button";
-import CreateFolder from "../dialog/createFolder";
+import CreateFolder from "../dialog/UploadDialog";
 
 // Zod schema for file validation
 const formSchema = z.object({
