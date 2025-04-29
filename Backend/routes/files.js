@@ -12,6 +12,7 @@ router.post(
     uploaderController.uploadFile
 );
 
+
 // router.get('/file/:fileId',
 //     passport.authenticate('jwt', { session: false }),
 //     uploaderController.getFile);

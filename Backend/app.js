@@ -13,10 +13,10 @@ const shareRoute = require("./routes/share");
 const prisma = new PrismaClient();
 
 app.use(cors({
-  origin: 'http://localhost:5173',  // Allow frontend origin
-  credentials: true,               // Allow cookies
-  allowedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie'],  // Ensure headers are correct
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],               // Allowed methods
+  origin: 'http://localhost:5173' || process.env.FRONTEND_URL,  
+  credentials: true,              
+  allowedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie'],  
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],               
 }));
 
 
@@ -29,19 +29,19 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure:false,  // For development; set to true in production with HTTPS
+      secure:false,  
       httpOnly: true,
       sameSite: 'strict',
-      maxAge: 1000 * 60 * 60 * 24,  // Session lasts for 1 day
+      maxAge: 1000 * 60 * 60 * 24,  
     },
     store: new PrismaSessionStore(prisma, {
-      checkPeriod: 2 * 60 * 1000,  // Remove expired sessions every 2 minutes
+      checkPeriod: 2 * 60 * 1000,  
       dbRecordIdIsSessionId: true,
     }),
   })
 );
 
-// Passport middleware (after session)
+
 app.use(passport.initialize());
 app.use(passport.session());
 

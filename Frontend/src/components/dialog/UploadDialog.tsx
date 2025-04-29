@@ -16,6 +16,7 @@ import Combobox  from "../combo/Combobox"
 import axios from "axios"
 import { toast } from "@/hooks/use-toast"
 import { useState } from "react"
+import { set } from "zod"
 
 
 interface Props {
@@ -31,6 +32,7 @@ export default function UploadComponet({ file }: Props) {
   const [folderId,setFolderId] = useState<string>('')
   const [creatBtnDisable, serCreateBtnDisable] = useState<boolean>(false)
   const [isOpen , setIsOpen] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
 
   const handleFolderChange = (folder: string) => {
     setSelectedFolder(folder)
@@ -71,6 +73,7 @@ export default function UploadComponet({ file }: Props) {
   const uploadFile = async (e: any) => {
     e.preventDefault()
     console.log(file)
+    setLoading(true)
     try {
       const folder = selectedFolder || folderName || 'public'
       const API_URL = import.meta.env.VITE_API_URL;
@@ -98,15 +101,18 @@ export default function UploadComponet({ file }: Props) {
         })
         setFolderCreated(false)
         setSelectedFolder("")
+        setLoading(false)
         setIsOpen(false);
       }
-    } catch (err) {
-      console.log(err)
+    } catch (err: any) {
+      
       toast({
-        title: 'Error',
-        description: `${err} happened`,
+        title: 'Failed',
+        description: `${err.response.data} happened`,
         variant: "destructive"
       })
+    } finally{
+      setLoading(false)
     }
   }
 
@@ -121,7 +127,7 @@ export default function UploadComponet({ file }: Props) {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-black text-2xl font-semibold font-Rubic mb-4">
-            Upload File
+            
           </DialogTitle>
           <DialogDescription>
             <span className="text-lg text-[#756E6E] flex mb-2">
@@ -134,7 +140,12 @@ export default function UploadComponet({ file }: Props) {
           </DialogDescription>
         </DialogHeader>
 
-        <Button type="submit" className="w-[95%] mx-auto h-8 rounded-sm text-[.9rem] font-Rubic" onClick={uploadFile}>Upload</Button>
+        <Button type="submit" className="w-[95%] mx-auto h-8 rounded-sm text-[.9rem] font-Rubic" onClick={uploadFile}>
+          {
+            loading ? 'Uploading...' : 'Upload'
+          }
+        
+          </Button>
 
         <div className="flex items-center justify-center space-x-4 mt-4">
           <div className="w-[40%] h-[.05rem] bg-black"></div>

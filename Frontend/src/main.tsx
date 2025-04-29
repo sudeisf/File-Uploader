@@ -9,7 +9,7 @@ import { AuthProvider } from './context/AuthContext.tsx';
 import ProtectedLayout from './components/layouts/ProtectedLayout.tsx';
 import Home from './pages/home.tsx';
 import { Toaster } from './components/ui/toaster.tsx';
-import { QueryClientProvider , queryClient } from './context/AuthContext.tsx';
+
 
 // Define your router
 const router = createBrowserRouter([
@@ -50,11 +50,11 @@ const router = createBrowserRouter([
 // Render the app
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
+    
     <AuthProvider>
       <RouterProvider router={router} />
       <Toaster />
     </AuthProvider>
-    </QueryClientProvider>
+   
   </StrictMode>
 );

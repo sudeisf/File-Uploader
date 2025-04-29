@@ -53,7 +53,6 @@ const  createFolder = async (req, res) => {
 }
 
 
-
 const getFolders = async (req, res) => {
     try {
         const user = req.user;
@@ -74,14 +73,15 @@ const getFolders = async (req, res) => {
         const folderDetails = await Promise.all(
             folders.map(async (folder) => {
                 const foldername = folder.name;
+                const folderPath = `${user.sub}/${foldername}`.replace(/\/$/, "");
                 try {
-                    // Fetch the files from the specified bucket
                     const { data, error } = await storage
-                        .from("users-files")
-                        .list(`$${user.sub}/${foldername}`, { limit: 100 });
+                        .from("users12")
+                        .list(folderPath, { limit: 100 , offset : 0,  sortBy: { column: 'name', order: 'asc' }
+                        }); 
 
                     if (error) {
-                        console.error('Error fetching files:', error.message);
+                        console.error(`Error fetching files for folder ${foldername}:`, error.message);
                         return {
                             ...folder,
                             files: [{
@@ -93,16 +93,14 @@ const getFolders = async (req, res) => {
                         };
                     }
 
-                    // If no files are returned, log and return empty files
                     if (!data || data.length === 0) {
-                        console.log(`No files found in bucket: ${buckname}`);
+                        console.log(`No files found in folder: ${foldername}`);
                         return {
                             ...folder,
                             files: [],
                         };
                     }
 
-                    // Optionally sort the files by name (or any other criteria)
                     const sortedFiles = data.sort((a, b) => a.name.localeCompare(b.name));
 
                     return {
@@ -111,7 +109,7 @@ const getFolders = async (req, res) => {
                     };
 
                 } catch (error) {
-                    console.error('Error processing bucket:', error.message);
+                    console.error(`Error processing folder ${foldername}:`, error.message);
                     return {
                         ...folder,
                         files: [{
@@ -132,7 +130,6 @@ const getFolders = async (req, res) => {
         return res.status(500).send('Internal server error');
     }
 };
-
 
 const getFoldersName = async (req, res) => {
     try {

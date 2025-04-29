@@ -34,16 +34,16 @@ const formSchema = z.object({
 });
 
 // Function to map file types to icons
-const setFileIconFunction = (file: File): string | undefined => {
-  const fileTypes: Record<string, string> = {
-    "image/jpeg": jpg,
-    "image/png": png,
-    "image/svg+xml": svg,
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": docx,
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation": pptx,
+  const setFileIconFunction = (file: File): string | undefined => {
+    const fileTypes: Record<string, string> = {
+      "image/jpeg": jpg,
+      "image/png": png,
+      "image/svg+xml": svg,
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": docx,
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation": pptx,
+    };
+    return fileTypes[file.type];
   };
-  return fileTypes[file.type];
-};
 
 export default function Uploader() {
   const [file, setFile] = useState<File | null>(null);
@@ -122,7 +122,7 @@ export default function Uploader() {
       });
     }
 
-    e.target.value = ""; // Reset input value to allow re-uploading the same file
+    e.target.value = ""; 
   };
 
   return (

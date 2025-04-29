@@ -1,6 +1,5 @@
 import axios from "axios";
-import { createContext, useContext, useState } from "react";
-import { useQuery, QueryClient, QueryClientProvider } from "react-query";
+import { createContext, useContext, useEffect, useState } from "react";
 
 type AuthContextType = {
   isLoggedIn: boolean;
@@ -10,9 +9,9 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const queryClient = new QueryClient();
-
-const fetchAuthStatus = async (): Promise<{ success: boolean }> => {
+const fetchAuthStatus = async (): Promise<{
+  data: any; success: boolean 
+}> => {
   const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/Protected`, {
     withCredentials: true,
   });
@@ -25,18 +24,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return storedIsLoggedIn === "true";
   });
 
-  useQuery("authStatus", fetchAuthStatus, {
-        refetchOnWindowFocus: false,
-        staleTime: 5 * 60 * 1000,
-        onSuccess: (data) => {
-            setIsLoggedIn(data.success);
-            localStorage.setItem("isLoggedIn", String(data.success));
-        },
-        onError: () => {
-            setIsLoggedIn(false);
-            localStorage.removeItem("isLoggedIn");
-        },
-    });
+ 
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const response = await fetchAuthStatus();
+        const data = response.data;
+        setIsLoggedIn(data.success);
+        localStorage.setItem("isLoggedIn", String(data.success));
+      } catch (error) {
+        setIsLoggedIn(false);
+        localStorage.removeItem("isLoggedIn");
+      }
+    };
+
+    
+    if (isLoggedIn === undefined) {
+      checkAuthStatus();
+    }
+  }, []); 
 
   const logout = async () => {
     try {
@@ -47,7 +53,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.success) {
         setIsLoggedIn(false);
         localStorage.removeItem("isLoggedIn");
-        queryClient.invalidateQueries("authStatus");
       }
     } catch (error) {
       console.error("Logout failed:", error);
@@ -69,4 +74,4 @@ const useAuth = () => {
   return context;
 };
 
-export { useAuth, QueryClientProvider, queryClient };
+export { useAuth };

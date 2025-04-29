@@ -44,7 +44,7 @@ export default function Login() {
                     variant: "default",
                 })
                 setIsLoggedIn(true);
-                localStorage.setItem("isLoggedIn", "true"); // Save to localStorage
+                localStorage.setItem("isLoggedIn", "true");
                 navigate("/protected/home");
             }
         }catch(e: any){

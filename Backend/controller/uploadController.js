@@ -5,7 +5,8 @@ const prisma = new PrismaClient();
 
 const path = require('path');
 const fs = require('fs');
-const { Int32 } = require('bson');
+const { MIMEType } = require('util');
+
 
 
 const pathToKey = path.join(__dirname, '../utils/', 'private.pem');
@@ -13,60 +14,75 @@ console.log(pathToKey);
 const PRIV_KEY = fs.readFileSync(pathToKey, 'utf8');
 
 
-const uploadFile = async (req, res) => {
-    const reqObj = {
-        id : req.folderID,
-        fileD : req.file,
-        folder : req.folder
-    }
 
-    console.log(req.reqObj)
+const uploadFile = async (req, res) => {
+    const { folderID,  folder } = req.body;
+    const user = req.user;
+    const file = req.file;
+
     try {
-        const user = req.user;
+     
         if (!user) {
             return res.status(401).send('Unauthorized');
         }
-        const file = req.file; 
+
+      
         if (!file) {
             return res.status(400).send('Please upload a file');
         }
-        const folderName = req.body.folder; 
+
+       
+        let folderName = folder || "public";
+
+        let folderRecord = await prisma.folder.findFirst({
+            where: {
+                name: folderName,
+                userId: user.sub,
+            },
+        });
+
+        if (!folderRecord) {
+            folderRecord = await prisma.folder.create({
+                data: {
+                    name: folderName,
+                    userId: user.sub,
+                },
+            });
+        }
+
+        
         const fileContent = fs.readFileSync(file.path);
         const { data, error } = await Sstorage.from("users-files").upload(
-            `${user.sub}/${folderName}/${file.originalname}`, // Ensure proper path,
-            fileContent
+            `${user.sub}/${folderName}/${file.originalname}`,
+            fileContent ,
+            {
+                contentType : file.mimetype,
+            }
+           
         );
 
-
+      
         if (error) {
             console.error('Supabase upload error:', error.message);
-            return res.status(400).send('File upload failed. Please try again later.');
+            return res.status(400).send(`${error.message}`);
         }
-        const userID = JSON.stringify(user.sub);
-        const folderID = JSON.stringify(req.folderID)
+
+        
         await prisma.file.create({
             data: {
-              folderId: folderID ? { connect: { id: folderID } } : undefined,
-              url: data.path,
-              userId:user.sub,
-              size: parseInt(file.size,10)
-               // directly use user.sub as a string
+                folderId: folderRecord.id, // Store the ID of the folder
+                url: data.path, // Supabase URL
+                userId: user.sub, // User ID
+                size: parseInt(file.size, 10), // File size
             },
-          });
-          
+        });
 
-        if (error) {
-            console.error('Supabase upload error:', error.message);
-            return res.status(400).send('File upload failed. Please try again later.');
-        }
-
-   
-
-
+        
         await fs.promises.unlink(file.path).catch((err) => {
             console.error('Failed to delete local file:', err);
         });
 
+        // Step 5: Return success response
         return res.status(200).send({
             message: 'File uploaded successfully',
             data,
