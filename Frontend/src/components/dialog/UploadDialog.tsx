@@ -16,7 +16,7 @@ import Combobox  from "../combo/Combobox"
 import axios from "axios"
 import { toast } from "@/hooks/use-toast"
 import { useState } from "react"
-import { set } from "zod"
+import { Loader2 } from "lucide-react"
 
 
 interface Props {
@@ -33,6 +33,7 @@ export default function UploadComponet({ file }: Props) {
   const [creatBtnDisable, serCreateBtnDisable] = useState<boolean>(false)
   const [isOpen , setIsOpen] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
+  const [createFolderLoading, setCreateFolderLoading] = useState<boolean>(false)
 
   const handleFolderChange = (folder: string) => {
     setSelectedFolder(folder)
@@ -41,6 +42,7 @@ export default function UploadComponet({ file }: Props) {
 
   const createFolderHandler = async (e: any) => {
     e.preventDefault()
+    setCreateFolderLoading(true)
     try {
       const API_URL = import.meta.env.VITE_API_URL;
       const res = await axios.post(`${API_URL}/api/folders/create-folder`, {
@@ -59,7 +61,8 @@ export default function UploadComponet({ file }: Props) {
           variant: "default",
         })
         serCreateBtnDisable(true)
-      }
+        setCreateFolderLoading(false)
+        }
     } catch (err) {
       console.error(err)
       toast({
@@ -67,7 +70,8 @@ export default function UploadComponet({ file }: Props) {
         description: 'An error occurred',
         variant: "destructive",
       })
-    }
+      setCreateFolderLoading(false)
+        }
   }
 
   const uploadFile = async (e: any) => {
@@ -142,7 +146,7 @@ export default function UploadComponet({ file }: Props) {
 
         <Button type="submit" className="w-[95%] mx-auto h-8 rounded-sm text-[.9rem] font-Rubic" onClick={uploadFile}>
           {
-            loading ? 'Uploading...' : 'Upload'
+              loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Upload'
           }
         
           </Button>
@@ -161,7 +165,7 @@ export default function UploadComponet({ file }: Props) {
             <Label className="text-black text-sm font-Rubic font-semibold">Folder name</Label>
             <Input
               value={folderName}
-              onChange={(e) => setFolderName(e.target.value)} // Update state with input value
+              onChange={(e) => setFolderName(e.target.value)} 
               className="w-[150px] mx-auto h-8 rounded-sm placeholder:text-xs placeholder:text-gray-400 font-rubik text-gray-700 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter folder name"
             />
@@ -171,7 +175,9 @@ export default function UploadComponet({ file }: Props) {
               className="w-[95px] h-8 rounded-sm text-[.9rem] font-Rubic"
               disabled={creatBtnDisable || selectedFolder !== ""}
             >
-              Create
+              {
+                createFolderLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create'
+              }
             </Button>
           </div>
           <p className="text-sm text-[#756E6E] font-medium font-Rubic w-[90%]">After you create a folder, click the upload button</p>

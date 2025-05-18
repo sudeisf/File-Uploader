@@ -76,7 +76,7 @@ const getFolders = async (req, res) => {
                 const folderPath = `${user.sub}/${foldername}`.replace(/\/$/, "");
                 try {
                     const { data, error } = await storage
-                        .from("users12")
+                        .from("users-files")
                         .list(folderPath, { limit: 100 , offset : 0,  sortBy: { column: 'name', order: 'asc' }
                         }); 
 

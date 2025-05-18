@@ -129,7 +129,7 @@ export default function Uploader() {
     <div className="w-full h-full max-h-[700px] bg-[#f5f3f3a3] p-2 rounded-lg shadow-sm">
       <div className="w-full h-full max-h-[700px] bg-white pt-8 rounded-lg border-2 shadow-sm">
         <div className="w-full mx-auto bg-white rounded-lg p-4 mb-4">
-                  <div
+          <div
             className={`relative w-[95%] mx-auto mb-4 mt-4 bg-white rounded-xl border-dotted border-[.2rem] ${
               dragActive ? "border-blue-500" : "border-[#d7d7d7]"
             }`}

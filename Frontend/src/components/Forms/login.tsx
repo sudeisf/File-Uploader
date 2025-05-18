@@ -9,7 +9,7 @@ import axios from "axios"
 import { useToast } from "@/hooks/use-toast"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
-
+import { Loader2 } from "lucide-react"
 const formSchema = z.object({
     username: z.string().min(3),
     password: z.string().min(6),
@@ -21,7 +21,7 @@ export default function Login() {
     const { toast  } = useToast();
     const navigate = useNavigate();
     const {setIsLoggedIn} = useAuth();
-
+    const {loading} = useAuth();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -92,7 +92,7 @@ export default function Login() {
                 <div className="text-right">
                     <a href="" className="text-right text-black  ">Forgot password ?</a>
                 </div>
-                <Button type="submit" className="w-full">Login</Button>
+                    <Button type="submit" className="w-full">{loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Login'} </Button>
                 <div className="text-center flex items-center justify-center gap-2">
                     <p>Don't have an account?</p>
                     <Link to='/register'>Register</Link>

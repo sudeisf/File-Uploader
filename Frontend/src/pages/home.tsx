@@ -20,7 +20,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
 import axios from "axios";
-import { Target } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 
@@ -31,7 +31,8 @@ import { useState } from "react";
 export default function Home() {
   const savedTab = localStorage.getItem("selecetedTab") || "upload";
   const [folderName, setFolderName] = useState<string>("")
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [uploadLoading, setUploadLoading] = useState<boolean>(false)
+  const [createFolderLoading, setCreateFolderLoading] = useState<boolean>(false)
 
   const handleTabChange = (value: string) => {
     localStorage.setItem("selecetedTab", value);
@@ -39,7 +40,7 @@ export default function Home() {
 
   const createFolderHandler = async (e: any) => {
     e.preventDefault()
-    setIsLoading(true)
+    setCreateFolderLoading(true)
     try {
       const API_URL = import.meta.env.VITE_API_URL;
       const res = await axios.post(`${API_URL}/api/folders/create-folder`, {
@@ -49,7 +50,7 @@ export default function Home() {
       })
       
       if (res.status === 200) {
-        setIsLoading(false)
+        setCreateFolderLoading(false)
         toast({
           title: "Success",
           description: 'Folder created successfully',
@@ -64,7 +65,7 @@ export default function Home() {
         variant: "destructive",
       })
     }finally{
-      setIsLoading(false)
+      setCreateFolderLoading(false)
     }
   }
 
@@ -75,7 +76,7 @@ export default function Home() {
      onValueChange={handleTabChange}
       className="w-[90%] max-w-[900px] mx-auto mt-10">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="upload" className="uppercase">Upload</TabsTrigger>
+        <TabsTrigger value="upload" className="capitalize">Upload</TabsTrigger>
         <TabsTrigger value="Folders">Folders</TabsTrigger>
       </TabsList>
       <TabsContent value="upload">
@@ -115,7 +116,7 @@ export default function Home() {
             onClick={createFolderHandler}
             className="w-full h-8 rounded-md text-[.9rem] font-Rubic text-white bg-black hover:bg-gray-700">
               {
-                isLoading ? 'Creating...' : 'Create'
+                createFolderLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create'
               }
             </button>
           </CardFooter>
