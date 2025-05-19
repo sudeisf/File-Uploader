@@ -12,16 +12,18 @@ router.post(
     uploaderController.uploadFile
 );
 
+router.get(
+    '/download/:folderName/:fileUid',
+    authenticateUser,
+    uploaderController.downloadFile
+);
 
-// router.get('/file/:fileId',
-//     passport.authenticate('jwt', { session: false }),
-//     uploaderController.getFile);
 
-// router.get('/test', 
-//     passport.authenticate('jwt', { session: false }),
-//     (req, res) => {
-//         res.send('Test route');
-//     }
-// );
+router.delete(
+    '/delete/:folderName/:fileUid',
+    authenticateUser,
+    uploaderController.deleteFile
+);
+
 
 module.exports = router;

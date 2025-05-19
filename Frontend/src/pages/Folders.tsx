@@ -22,18 +22,25 @@ import jpg from "@/assets/jpeg-svgrepo-com.svg";
 
 import { Key, useEffect , useState } from "react";
 import { useFolder } from "@/hooks/useFolder";
+import { toast } from "@/hooks/use-toast";
+import axios from "axios";
+import { Button } from "@/components/ui/button";
+interface Folder {
+  name: string;
+  files: { 
+    name: string;
+    id: string;
+     metadata: {
+      originalName: string;
+      mimetype: string;
+      size: number 
+} }[];
+}
 
 
 
 export default function Folders() {
-    interface Folder {
-      name: string;
-      files: { name: string; metadata: {
-          mimetype: string; size: number 
-} }[];
-    }
-    const {data,isLoading,error} = useFolder();
-    
+    const {data,isLoading} = useFolder();
     console.log(data);
     const setFileIconFunction = (file: { name: string; type: string }): string | undefined => {
         const fileTypes: Record<string, string> = {
@@ -54,7 +61,79 @@ export default function Folders() {
         }
         return `${size} Bytes`;
       };
-      
+
+
+      const handleDelete = async (folderName: string, fileId: string) => {
+        console.log(folderName, fileId);
+          try{
+                const API_URL = import.meta.env.VITE_API_URL;
+                const data = await axios.delete(`${API_URL}/api/files/delete/${folderName}/${fileId}` , {
+                 withCredentials: true,
+                });
+                if(data.status === 200){
+                  toast({
+                    title: "File deleted successfully",
+                    description: "File deleted successfully",
+                    variant: "default",
+                  });
+                } else {
+                  toast({
+                    title: "File deletion failed",
+                    description: "File deletion failed 90",
+                    variant: "destructive",
+                  });
+                } 
+          }catch(error){
+            console.log(error);
+            toast({
+              title: "File deletion failed",
+              description: "File deletion failed 89",
+              variant: "destructive",
+            });
+          }
+      }
+
+      const handleDownload = async (folderName: string, fileId: string) => {
+        try{
+
+            const APIURl = import.meta.env.VITE_API_URL;
+            const response = await axios.get(`${APIURl}/api/files/download/${folderName}/${fileId}`,{
+              withCredentials: true,
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            
+            const contentDisposition = response.headers['content-disposition'];
+            const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
+            const fileName = fileNameMatch ? fileNameMatch[1] : 'download';
+            
+            
+            link.setAttribute('download', fileName);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+            // Clean up
+            setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+
+            toast({
+              title: "Download started",
+              description: "Your file is being downloaded",
+              variant: "default",
+            });
+        }catch(error){
+          console.log(error);
+          toast({
+            title: "File download failed",
+            description: `File download failed ${error}`,
+            variant: "destructive",
+            duration: 3000,
+          });
+        }
+      }
   
     return (
       <>
@@ -89,15 +168,21 @@ export default function Folders() {
                           <MenubarTrigger>
                             <EllipsisVertical className="w-3" />
                           </MenubarTrigger>
-                          <MenubarContent className="flex flex-col">
-                            <MenubarItem className="flex items-center gap-3">
+                          <MenubarContent className="flex flex-col w-8">
+                            <MenubarItem className="flex">
+                              <Button variant="ghost" className="w-fit">
                               <Share className="w-4" /> Share
+                              </Button>
                             </MenubarItem>
-                            <MenubarItem className="text-red-700 flex items-center gap-3">
-                              <Trash className="w-4" /> Delete
+                            <MenubarItem  className="text-red-700 flex items-center">
+                              <Button onClick={() => handleDelete(folder.name,file.id)} variant="ghost" className="text-red-700 w-fit">
+                                <Trash className="w-4" /> Delete
+                              </Button>
                             </MenubarItem>
-                            <MenubarItem className="flex items-center gap-3">
-                              <Download className="w-4 h-5" /> Download
+                            <MenubarItem className="flex items-center">
+                              <Button onClick={() => handleDownload(folder.name,file.id)} variant="ghost" className="w-fit">
+                                <Download className="w-4" /> Download
+                              </Button>
                             </MenubarItem>
                           </MenubarContent>
                         </MenubarMenu>

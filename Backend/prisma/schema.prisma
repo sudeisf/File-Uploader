@@ -35,6 +35,8 @@ model Folder {
 
 model File {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  uid       String
   url       String
   size      Int
   folderId  String?  @db.ObjectId

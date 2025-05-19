@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
 import { Loader2 } from "lucide-react"
+import { useState } from "react"
 const formSchema = z.object({
     username: z.string().min(3),
     password: z.string().min(6),
@@ -21,7 +22,7 @@ export default function Login() {
     const { toast  } = useToast();
     const navigate = useNavigate();
     const {setIsLoggedIn} = useAuth();
-    const {loading} = useAuth();
+    const [loading, setLoading] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -34,6 +35,7 @@ export default function Login() {
 
    async function onSubmit(values: z.infer<typeof formSchema>) { 
         try{
+            setLoading(true);
             const API_URL  = import.meta.env.VITE_API_URL;
             const response  = await axios.post(`${API_URL}/api/auth/login`, values ,{withCredentials: true});
             const data = response.data;
@@ -54,6 +56,9 @@ export default function Login() {
                 description: e.response.data.message,
                 variant: "destructive",
             })
+            setLoading(false);
+        }finally{
+            setLoading(false);
         }
     }
 
@@ -92,7 +97,7 @@ export default function Login() {
                 <div className="text-right">
                     <a href="" className="text-right text-black  ">Forgot password ?</a>
                 </div>
-                    <Button type="submit" className="w-full">{loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Login'} </Button>
+                    <Button type="submit" className="w-full">{ loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Login'} </Button>
                 <div className="text-center flex items-center justify-center gap-2">
                     <p>Don't have an account?</p>
                     <Link to='/register'>Register</Link>
